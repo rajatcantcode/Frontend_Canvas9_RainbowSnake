@@ -1,4 +1,11 @@
-import utils from "./utils.js";
+// Perlin noise is a random sequence generator producing a more naturally ordered, harmonic
+// succession of numbers compared to the standard <b>random()</b> function.
+// Perlin noise, invented by Ken Perlin, creates natural-looking textures and motion.
+// Unlike random functions, it operates in an infinite-dimensional space, giving consistent semi-random values.
+// It's used in graphics for procedural textures and animation.
+// The noise is structured like an audio signal, with frequencies and octaves adding complexity.
+// Smaller differences between coordinates result in smoother noise sequences.
+
 import { noise } from "@chriscourses/perlin-noise";
 
 const canvas = document.querySelector("canvas");
@@ -11,8 +18,6 @@ const mouse = {
   x: innerWidth / 2,
   y: innerHeight / 2,
 };
-
-const colors = ["#2185C5", "#7ECEFD", "#FFF6E5", "#FF7F66"];
 
 // Event Listeners
 addEventListener("mousemove", (event) => {
@@ -28,20 +33,24 @@ addEventListener("resize", () => {
 });
 
 // Objects
-class Object {
-  constructor(x, y, radius, color) {
+class Circle {
+  constructor(x, y, radius, color, offset) {
     this.x = x;
     this.y = y;
     this.radius = radius;
     this.color = color;
+    this.offset = offset;
   }
 
   draw() {
+    c.save();
+    c.alpha = 0.01;
     c.beginPath();
     c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
     c.fillStyle = this.color;
     c.fill();
     c.closePath();
+    c.restore();
   }
 
   update() {
@@ -50,24 +59,39 @@ class Object {
 }
 
 // Implementation
-let objects;
+let circles;
 function init() {
-  objects = [];
+  circles = [];
 
-  for (let i = 0; i < 400; i++) {
-    // objects.push()
+  for (let i = 0; i < 500; i++) {
+    circles.push(
+      new Circle(
+        20,
+        20,
+        10,
+        `hsl(${255 * (i / 500)}, 50%, 50%)`,
+        Math.random() * 2
+      )
+    );
   }
 }
 
 // Animation Loop
+let time1 = 0;
+let time2 = 0;
 function animate() {
   requestAnimationFrame(animate);
-  c.clearRect(0, 0, canvas.width, canvas.height);
+  c.fillStyle = "rgba(0, 0, 0, 0.01)";
+  c.fillRect(0, 0, canvas.width, canvas.height);
 
-  c.fillText("HTML CANVAS BOILERPLATE", mouse.x, mouse.y);
-  // objects.forEach(object => {
-  //  object.update()
-  // })
+  circles.forEach((circle) => {
+    circle.x = noise(time1 + circle.offset) * innerWidth;
+    circle.y = noise(time2 + circle.offset) * innerHeight;
+    circle.update();
+  });
+
+  time1 += 0.003;
+  time2 += 0.005;
 }
 
 init();
