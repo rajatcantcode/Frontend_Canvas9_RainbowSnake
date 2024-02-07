@@ -19,11 +19,6 @@ const mouse = {
   y: innerHeight / 2,
 };
 
-// Event Listeners
-addEventListener("mousemove", (event) => {
-  mouse.x = event.clientX;
-  mouse.y = event.clientY;
-});
 
 addEventListener("resize", () => {
   canvas.width = innerWidth;
